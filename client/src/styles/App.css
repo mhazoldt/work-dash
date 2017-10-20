@@ -1,0 +1,114 @@
+.shift2 {
+  margin-left:22px;
+  margin-top:-5px;
+}
+
+.shift3 {
+  margin-right:10px;
+  width:75px;
+}
+
+.main-layout {
+  display: flex;
+  flex-flow: column nowrap;
+  justify-content: space-between;
+  min-height: 100vh;
+  /* border: 4px solid red; */
+}
+
+#WrapDiv:first-child {
+  width: 100% !important;
+  min-width: 100%;
+  max-width: 100%;
+  border: 5px solid firebrick;
+}
+/* icon prefix focus color */
+.input-field .prefix.active {
+  color: #000;
+}
+
+
+/* label underline focus color */
+#login-username.input-field input[type=text]:focus {
+  border-bottom: 1px solid #00b0ff;
+  /* box-shadow: 0 1px 0 0 #000; */
+}
+
+/* label underline focus color */
+#login-password.input-field input[type=password]:focus {
+  border-bottom: 1px solid #00b0ff;
+  /* box-shadow: 0 1px 0 0 #000; */
+}
+
+#search-bar.input-field input[type=text]:focus {
+  border-bottom: 1px solid #00b0ff;
+  /* box-shadow: 0 1px 0 0 #000; */
+}
+
+#gridList {
+  /* width: 1000px; */
+  margin: 0 auto;
+  list-style-type: none;
+  display: flex;
+  flex-flow: row wrap;
+  padding: 0px;
+  box-sizing: border-box;
+  /* border: 1px solid black; */
+}
+
+div.item.gridListItem {
+  box-sizing: border-box;
+  width: calc(100%/4);
+  height: 250px;
+  /* border: 1px solid black; */
+  padding: 10px !important;
+}
+
+
+
+#gridList > div.item.gridListItem > div.gridListItemDiv {
+  height: 100%;
+  /* background-color: blue; */
+
+}
+
+.ui.card > .extra.no-border-extra {
+  border-top: 1px solid rgba(0, 0, 0, 0) !important;
+}
+
+.ui.fitted.checkbox.checkboxSize label {
+  width: 100%;
+  border: 1px solid red;
+}
+
+.ui.button.checkboxButton, 
+.ui.button.checkboxButton:visited,
+.ui.button.checkboxButton:link,
+.ui.button.checkboxButton:hover,
+.ui.button.checkboxButton:active,
+.ui.button.checkboxButton:focus {
+  color: black;
+  background-color: transparent;
+  border: 0px;
+  outline: 0px;
+  border: 0px solid red;
+  width: 15px;
+  display: flex;
+  justify-content: center;
+  margin: 0px;
+  padding: 0px;
+  width: 100%;
+}
+
+.cut-text {
+  text-overflow: ellipsis;
+  overflow: hidden;
+  width: 200px;
+  max-height: 150px;
+  white-space: nowrap;
+  border: 0px solid black;
+  color: white;
+ 
+
+}
+

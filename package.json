@@ -1,0 +1,19 @@
+{
+  "name": "work-dash",
+  "version": "1.0.0",
+  "main": "index.js",
+  "author": "Michael Sweeney <jfmike@gmail.com> (https://github.com/overthemike)",
+  "license": "MIT",
+  "dependencies": {
+    "concurrently": "^3.5.0",
+    "shortid": "^2.2.8"
+  },
+  "scripts": {
+    "start": "concurrently \"yarn run server\" \"yarn run client\"",
+    "client": "cd client && yarn start",
+    "server": "cd server && yarn start",
+    "build": "cd server/public && rm -rf * && cd ../../client && yarn build",
+    "deploy": "git push heroku master",
+    "bad": "yarn run build && yarn run deploy"
+  }
+}
