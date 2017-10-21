@@ -263,6 +263,10 @@ class TaskList extends Component {
                 if(job.response_received === 0){responseReceived = false}
                 if(job.response_received === 1){responseReceived = true}
 
+                haveApplied = job.applied
+                responseReceived = job.response_received
+
+
                 console.log("index", idx)
                 console.log({haveApplied})
                 console.log({responseReceived})

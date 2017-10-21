@@ -7,12 +7,15 @@ let config = require('config')
 let request = require('request');
 
 router.post("/token", function(req, res, next){
+  console.log("got to token")
   const username = req.body.username
   const password = req.body.password
 
+  console.log({username})
+
   const sql = `
     SELECT password, id FROM users
-    WHERE username = ?
+    WHERE username = $1
   `
 
   if (!username && !password) {
@@ -22,8 +25,9 @@ router.post("/token", function(req, res, next){
   } else {
 
     db.query(sql, [username], function(err, results, fields){
-      let hashedPassword = results[0].password
-      let user_id = results[0].id
+      console.log({results})
+      let hashedPassword = results.rows[0].password
+      let user_id = results.rows[0].id
       // console.log({hashedPassword})
       hashedPassword = hashedPassword.toString()
       // console.log({hashedPassword})
@@ -51,20 +55,20 @@ router.post("/token", function(req, res, next){
 
 
 router.post("/register", function(req, res, next){
-
+    console.log("got to register")
     const username = req.body.username
     const password = req.body.password
 
     const sql = `
       INSERT INTO users (username, password)
-      VALUES (?, ?)
+      VALUES ($1, $2)
     `
 
     bcrypt.hash(password, 10, bcryptResult)
     function bcryptResult(err, hashedPassword) {
         // console.log("hashedPassword")
         // console.log(hashedPassword)
-        let sql = "INSERT INTO users (username, password) VALUES(?, ?)"
+        let sql = "INSERT INTO users (username, password) VALUES($1, $2)"
         db.query(sql, [username, hashedPassword], usersResults)
     }
     function usersResults(err, results, fields) {
@@ -111,19 +115,23 @@ router.post("/addjob", function(req, res, next){
 
   // console.log({req})
   // console.log({detailUrl})
+  console.log("###### ADD JOB ######")
+  console.log({user_id})
+  console.log({detailUrl})
 
-  const sql = `
-    INSERT INTO job_listings_saved (detailUrl, jobTitle, company, location, date, user_id, applied, response_received, followed_up)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-  `
+
+  const sql = `INSERT INTO public.job_listings_saved ("detailUrl", "jobTitle", "company", "location", "date", "user_id", applied, response_received, "followed_up") VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`
+
   db.query(sql, [detailUrl, jobTitle, company, location, date, user_id, applied, response_received, followed_up], jobResults)
   function jobResults(err, results, fields) {
     if(err) {
+        console.log("#### QUERY HAD ERRORS ####")
         console.log(err)
         let jsonRes = {"status": "fail", "message": "could not add job"}
         // console.log(jsonRes)
         res.json(jsonRes)
     } else {
+        console.log(" #### NO ERRORS ON QUERY ####")
         let jsonRes = {"message": "job added"}
         // console.log(jsonRes)
         res.json(jsonRes)
@@ -150,7 +158,7 @@ router.get('/listjobs/:id', function(req, res, next) {
   // get request data
   let user_id = req.params.id
   let sql = `
-    SELECT * FROM job_listings_saved WHERE user_id = ?
+    SELECT * FROM job_listings_saved WHERE "user_id" = $1
   `
 
   // do database stuff
@@ -160,12 +168,13 @@ router.get('/listjobs/:id', function(req, res, next) {
   function jobList(err, results, fields) {
     if(err) {
         console.log(err)
-        let jsonRes = {"status": "fail", "message": "could not find jobs"}
+        let jsonRes = [{ detailUrl: "", data: {"status": "fail", "message": "could not find jobs"} }]
         // console.log(jsonRes)
         res.json(jsonRes)
     } else {
         let jsonRes = results
-        res.json(jsonRes)
+       
+        res.json(jsonRes.rows)
 
     }
 
@@ -181,7 +190,7 @@ router.get('/listjobs/:id', function(req, res, next) {
 //
 // list activities
 router.post('/editjob/:id', function(req, res, next) {
-
+    console.log("##### edit jobs ####")
     // console.log(req)
 
     // get request data
@@ -199,16 +208,16 @@ router.post('/editjob/:id', function(req, res, next) {
 
     const sql = `
       UPDATE job_listings_saved
-       SET detailUrl = ?,
-           jobTitle = ?,
-           company = ?,
-           location = ?,
-           date = ?,
-           applied = ?,
-           response_received = ?,
-           followed_up = ?,
-           deleted = ?
-       WHERE idjob_listings = ?
+       SET "detailUrl" = $1,
+           "jobTitle" = $2,
+           "company" = $3,
+           "location" = $4,
+           "date" = $5,
+           applied = $6,
+           response_received = $7,
+           "followed_up" = $8,
+           deleted = $9
+       WHERE idjob_listings = $10
     `
 
     // do database stuff
@@ -216,11 +225,13 @@ router.post('/editjob/:id', function(req, res, next) {
 
     function jobUpdate(err, results, fields) {
       if(err) {
+          console.log("errors on edit")
           console.log(err)
           let jsonRes = {"status": "fail", "message": "could not update job"}
           // console.log(jsonRes)
           res.json(jsonRes)
       } else {
+          console.log("no erros on edit")
           let jsonRes = {"message": "job update success"}
           // console.log(jsonRes)
           res.json(jsonRes)
@@ -243,7 +254,7 @@ router.post('/removejob/:id', function(req, res, next) {
 
     const sql = `
       DELETE FROM job_listings_saved
-       WHERE idjob_listings = ?
+       WHERE idjob_listings = $1
     `
 
     // do database stuff
@@ -287,7 +298,7 @@ router.post("/addappdata/:id", function(req, res, next){
 
   const sql = `
     INSERT INTO app_data (label, data, user_id)
-    VALUES (?, ?, ?)
+    VALUES ($1, $2, $3)
   `
   db.query(sql, [label, data, user_id], appDataResults)
   function appDataResults(err, results, fields) {
@@ -319,7 +330,7 @@ router.get('/listappdata/:id', function(req, res, next) {
     // get request data
     let user_id = req.params.id
     let sql = `
-      SELECT * FROM app_data WHERE user_id = ?
+      SELECT * FROM app_data WHERE user_id = $1
     `
   
     // do database stuff
@@ -355,7 +366,7 @@ router.post('/removeappdata/:id', function(req, res, next) {
   
       const sql = `
         DELETE FROM app_data
-         WHERE idapp_data = ?
+         WHERE idapp_data = $1
       `
   
       // do database stuff
@@ -394,9 +405,9 @@ router.post('/editappdata/:id', function(req, res, next) {
   
       const sql = `
         UPDATE app_data
-         SET label = ?,
-             data = ?
-         WHERE idapp_data = ?
+         SET label = $1,
+             data = $2
+         WHERE idapp_data = $3
       `
   
       // do database stuff
@@ -430,22 +441,32 @@ router.post('/editappdata/:id', function(req, res, next) {
 function queryUrlBuilder(search, location) {
   console.log("got to queryUrlBuilder()")
 
-  search = search.replace(/ /g, "+")
-  location = location.replace(/ /g, "+")
-
   let url = 'https://jobs.github.com/positions.json?'
-  let searchQuery = `search=${search}`
-  let locationQuery = `&location=${location}`
+  let searchQuery
+  let locationQuery
+
+  if(search) { 
+    search = search.replace(/ /g, "+") 
+    searchQuery = `search=${search}`
+    url = url + searchQuery
+
+  }
+
+
+  if(location) { 
+    location = location.replace(/ /g, "+") 
+    locationQuery = `&location=${location}`
+    url = url + locationQuery
+
+  }
+
   // let state = `&state=${this.state.searchState}`
   
   // let fullTimeQuery = `&full_time=${fullTime}`
 
   // console.log({fullTime})
 
-  url = url + searchQuery
-
   // if(this.state.searchCity) {url = url + state}
-  if(location) {url = url + locationQuery}
   // if(location) {url = url + fullTime}
   console.log({url})
 
@@ -460,7 +481,7 @@ function queryUrlBuilder(search, location) {
 // response: [ {"label": "label", "data": "data"} ]
 //           {"status": "fails", "message": "could not list app data"}
 //
-// list app data
+// job search
 router.get('/jobsearch?', function(req, res, next) {
   let search = req.query.search
   let location = req.query.location

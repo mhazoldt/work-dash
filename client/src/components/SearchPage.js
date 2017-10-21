@@ -81,6 +81,12 @@ class SearchPage extends Component {
         })
         .catch((err) => {
 			console.log(err)
+			console.log("<SearchPage> - error - updateTaskListJson() - GET - /api/listjobs/:id")
+
+			let data = [{detailUrl: "", data: err}]
+			console.log("REDUX <SearchPage> - error - updateTaskListJson() - DISPATCH setTaskListJson()")
+            this.props.dispatch(setTaskListJson([]))
+			this.generateCards([])
 
         })
 
@@ -223,7 +229,9 @@ class SearchPage extends Component {
 		})
 
 		console.log("REDUX <SearchPage> - generateCards() - DISPATCH setSearchResults()")
-		this.props.dispatch(setSearchResults(cards))
+		this.props.dispatch(setSearchResults([]))
+		setTimeout(this.props.dispatch(setSearchResults(cards)), 5000);
+		// this.props.dispatch(setSearchResults(cards))
 
 	}
 
@@ -306,12 +314,19 @@ class SearchPage extends Component {
 	}
 
 
+	clearResults = (event) => {
+		
+		this.props.dispatch(setSearchResults([]))
+		setTimeout(this.handleSubmit(event), 1000);
+
+	}
+
+
 	handleSubmit = (event) => {
 		console.log("<SearchPage> - handleSubmit()")
 		event.preventDefault()
 
 		this.setState({searchLoading: true})
-		this.setState({results: []})
 
 		const url = this.queryUrlBuilder()
 
@@ -323,12 +338,11 @@ class SearchPage extends Component {
 			this.setState({searchLoading: false})
 			console.log({data})
 
-			this.setState({jsonRes: data.resultItemList})
+			// this.setState({jsonRes: data.resultItemList})
 
 			console.log("REDUX <SearchPage> - handleSubmit() - DISPATCH setSearchResultsJson()")
 			this.props.dispatch(setSearchResultsJson(data.resultItemList))
 
-			console.log("data", data.resultItemList)
 
 			this.setState({cardsSetFromSearch: true})
 			this.setState({cardsSetFromSave: false})
@@ -391,7 +405,7 @@ class SearchPage extends Component {
 		return(
 
 			<div>
-				<Form onSubmit={this.handleSubmit}>
+				<Form onSubmit={this.clearResults}>
 					<Grid columns='equal'>
 
 						<Grid.Row>
