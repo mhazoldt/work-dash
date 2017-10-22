@@ -1,7 +1,7 @@
-function searchResults(state=[], action) {
-    console.log("REDUX reducer: searchResults(), type: SET_SEARCH_RESULTS")
+function searchResultsJsx(state=[], action) {
+    console.log("REDUX reducer: searchResultsJsx(), type: SET_SEARCH_RESULTS_JSX")
     switch(action.type){
-        case 'SET_SEARCH_RESULTS': {
+        case 'SET_SEARCH_RESULTS_JSX': {
             state = action.data
             console.log({state})
             console.log("")
@@ -14,4 +14,4 @@ function searchResults(state=[], action) {
    
 }
 
-export default searchResults
+export default searchResultsJsx

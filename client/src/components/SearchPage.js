@@ -4,10 +4,10 @@ import shortid from 'shortid'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router'
 import { Grid, Form, Input, Checkbox, Icon, Card, Transition, Label } from 'semantic-ui-react'
-import setSearchResults from '../reduxActionCreators/setSearchResults'
+import setSearchResultsJsx from '../reduxActionCreators/setSearchResultsJsx'
 import setSearchResultsJson from '../reduxActionCreators/setSearchResultsJson'
 import setTaskListJson from '../reduxActionCreators/setTaskListJson'
-import demoResults from '../demoResults.js'
+import SearchResults from './SearchResults'
 
 
 class SearchPage extends Component {
@@ -21,13 +21,10 @@ class SearchPage extends Component {
 			searchText: '',
 			searchState: '',
 			searchCity: '',
-			directJobsOnly: true,
-			results: [],
-			jsonRes: [],
-			cardsSetFromSearch: false,
-			cardsSetFromMount: false,
-			cardsSetFromSave: false,
-			searchLoading: false
+			fullTimeOnly: true,
+			searchLoading: false,
+			setFrom: {search: false, mount: false, saved: false, input: false},
+			resultsMount: []
 
 		}
 
@@ -37,6 +34,7 @@ class SearchPage extends Component {
 	handleChange = (e) => {
 		console.log("<SearchPage> - handleChange()")
 		console.log(e.target.value)
+		this.changeSetFrom("input")
 
 		this.setState({
 			[e.target.name]: e.target.value
@@ -48,9 +46,10 @@ class SearchPage extends Component {
 
 	handleCheck = (e) => {
 		console.log("<SearchPage> - handleCheck()")
+		this.changeSetFrom("input")
 
 		this.setState({
-			directJobsOnly: !(this.state.directJobsOnly),
+			fullTimeOnly: !(this.state.fullTimeOnly),
 			results: []
 
 		})
@@ -58,274 +57,58 @@ class SearchPage extends Component {
 	}
 
 
-	updateTaskListJson = () => {
-		console.log("<SearchPage> - updateTaskListJson()")
+	changeSetFrom(origin) {
+		console.log('%cchangeSetFrom()', 'color: #00ff00')
+		let state = {search: false, mount: false, saved: false, input: false}
 
-		let user_id = localStorage.getItem('user_id')
-
-		console.log("<SearchPage> - FETCH - updateTaskListJson() - GET - /api/listjobs/:id")
-        fetch(`/api/listjobs/${user_id}`)
-        .then((results) => {
-			return results.json()
-
-        })
-        .then((data) => {
-			console.log("<SearchPage> - THEN - updateTaskListJson() - GET - /api/listjobs/:id")
-            console.log({data})
-			console.log("")
-
-			console.log("REDUX <SearchPage> - updateTaskListJson() - DISPATCH setTaskListJson()")
-            this.props.dispatch(setTaskListJson(data))
-			this.generateCards(data)
-
-        })
-        .catch((err) => {
-			console.log(err)
-			console.log("<SearchPage> - error - updateTaskListJson() - GET - /api/listjobs/:id")
-
-			let data = [{detailUrl: "", data: err}]
-			console.log("REDUX <SearchPage> - error - updateTaskListJson() - DISPATCH setTaskListJson()")
-            this.props.dispatch(setTaskListJson([]))
-			this.generateCards([])
-
-        })
-
-    }
-
-	generateCards = (taskListJson) => {
-		console.log("<SearchPage> - generateCards()")
-		let searchResultsJson = this.props.searchResultsJson
-
-		let cards = []
-
-		cards = searchResultsJson.map((job, idx) => {
-			let alreadyInTaskList = false
-
-			taskListJson.forEach((jsonEntry) => {
-				if(jsonEntry.detailUrl === job.detailUrl) {
-					alreadyInTaskList = true
-
-				}
-
-			})
-
-			let longJobTitle
-
-			if(job.jobTitle.length > 40) {
-				longJobTitle = true
-
-			} else {
-				longJobTitle = false
-
-			}
-
-			if(alreadyInTaskList && this.props.isAuthenticated){
-				return (
-
-					<Grid.Column computer={4} tablet={8} mobile={16} key={'card' + shortid.generate()}>
-							<Card color='green' style={{height: "250px"}} className="mx-auto">
-
-
-								<Card.Content>
-									{longJobTitle &&
-										<Card.Header className="cut-text">
-											<Icon color='green' name='suitcase' /> {job.jobTitle}
-										</Card.Header>
-
-									}
-									{!(longJobTitle) &&
-										<Card.Header>
-										<span style={{color: "#016936"}}><Icon name='suitcase' /> {job.jobTitle}</span>
-										</Card.Header>
-
-									}
-									<Card.Meta>
-										{job.company}
-									</Card.Meta>
-									<Card.Description>
-									</Card.Description>
-								</Card.Content>
-
-
-								<Card.Content className="no-border-extra" extra>
-									<Label as='a' color='green' style={{marginBottom: "15px"}} ribbon>Saved</Label>
-									<div className='ui two buttons'>
-										<Button icon='checkmark' value={idx}></Button>
-										<Button href={job.detailUrl} rel="noopener noreferrer" target="_blank" basic color='blue'>Link</Button>
-									</div>
-								</Card.Content>
-
-
-								<Card.Content extra>
-									<div style={{display: "flex", justifyContent: "space-between"}}>
-										<a href={job.detailUrl}>{job.date}</a>
-										<span>{job.location}</span>
-									</div>
-								</Card.Content>
-							</Card>
-					</Grid.Column>
-
-				)
-
-			} else {
-				return (
-
-					<Grid.Column computer={4} tablet={8} mobile={16} key={'card' + shortid.generate()}>
-							<Card color='violet' style={{height: "250px"}} className="mx-auto">
-
-
-								<Card.Content>
-									{longJobTitle &&
-										<Card.Header className="cut-text">
-											<Icon name='suitcase' /> {job.jobTitle}
-										</Card.Header>
-
-									}
-									{!(longJobTitle) &&
-										<Card.Header>
-											<Icon name='suitcase' /> {job.jobTitle}
-										</Card.Header>
-
-									}
-									<Card.Meta>
-										{job.company}
-									</Card.Meta>
-									<Card.Description>
-									</Card.Description>
-								</Card.Content>
-
-
-								<Card.Content className="no-border-extra" extra>
-									<div className='ui two buttons'>
-										{this.props.isAuthenticated && <Button icon='save' color='green' value={idx} onClick={this.handleSave}></Button>}
-										{!(this.props.isAuthenticated) && <Button icon='save' color='green' href='/login'></Button>}
-										<Button href={job.detailUrl} rel="noopener noreferrer" target="_blank" basic color='blue'>Link</Button>
-									</div>
-								</Card.Content>
-
-
-								<Card.Content extra>
-									<div style={{display: "flex", justifyContent: "space-between"}}>
-										<a href={job.detailUrl}>{job.date}</a>
-										<span>{job.location}</span>
-									</div>
-								</Card.Content>
-							</Card>
-					</Grid.Column>
-
-				)
-
-			}
-
-		})
-
-		this.setState({
-			results: cards,
-			searchText: '',
-			searchState: '',
-			searchCity: '',
-			directJobsOnly: false,
-
-		})
-
-		console.log("REDUX <SearchPage> - generateCards() - DISPATCH setSearchResults()")
-		this.props.dispatch(setSearchResults([]))
-		setTimeout(this.props.dispatch(setSearchResults(cards)), 5000);
-		// this.props.dispatch(setSearchResults(cards))
-
-	}
-
-
-	handleSave = (e) => {
-		console.log("<SearchPage> - handleSave()")
-		
-		let user_id = localStorage.getItem('user_id')
-		let jobIndex = e.currentTarget.value
-
-		console.log(JSON.stringify({user_id}))
-		console.log(JSON.stringify({jobIndex}))
-
-		let jobData = this.props.searchResultsJson[jobIndex]
-		jobData.user_id = user_id
-		jobData.applied = false
-		jobData.response_received = false
-		jobData.followed_up = ""
-
-		console.log("<SearchPage> - FETCH - handleSave() - POST - /api/addjob")
-		console.log(JSON.stringify({jobData}))
-		fetch('/api/addjob', {
-			method: 'POST',
-			headers: {
-				'Accept': 'application/json',
-				'Content-Type': 'application/json'
-
-			},
-			body: JSON.stringify(jobData)
-
-		})
-		.then((results) => {
-			return results.json()
-
-		})
-		.then((thenData) => {
-			console.log("<SearchPage> - THEN - handleSave() - POST - /api/addjob")
-			console.log(JSON.stringify({thenData}))
-
-			this.setState({cardsSetFromSearch: false})
-			this.setState({cardsSetFromSave: true})
-			this.setState({cardsSetFromMount: false})
-			this.updateTaskListJson()
-
-		})
-		.catch((err) => {
-			console.log(err)
-
-		})
+		state[origin] = true
+		console.log("changeSetFrom", {state})
+		this.setState({setFrom: state})
 
 	}
 
 
 	queryUrlBuilder = () => {
-
-
-		let searchString = this.state.searchText
-		let cityString = this.state.searchCity
-
-		searchString = searchString.replace(/ /g, "+")
-		cityString = cityString.replace(/ /g, "+")
+		console.log('%cqueryUrlBuilder()', 'color: #ffbf00')
 
 		let url = '/api/jobsearch?'
-		let search = `search=${searchString}`
-		let location = `&location=${cityString}`
-		// let state = `&state=${this.state.searchState}`
+
+		if(this.state.searchText) {
+			let searchString = this.state.searchText
+			searchString = searchString.replace(/ /g, "+")
+			let search = `search=${searchString}`
+			url = url + search
+
+		}
+
+		if(this.state.searchCity) {
+			let cityString = this.state.searchCity
+			cityString = cityString.replace(/ /g, "+")
+			let location = `&location=${cityString}`
+			url = url + location
+
+		}
+
+		if(this.state.fullTimeOnly) {
+			let fullTime = `&full_time=true`
+			url = url + fullTime
 		
-		// let fullTime = `&full_time=true`
-
-		// console.log({fullTime})
-
-		url = url + search
-
-		// if(this.state.searchCity) {url = url + state}
-		if(this.state.searchCity) {url = url + location}
-		// if(this.state.directJobsOnly) {url = url + fullTime}
-
+		}
+		
+		console.log('%cURL', 'color: #ffbf00')
+		console.log(`%c${url}`, 'color: #ffbf00')
 		return url
-
-	}
-
-
-	clearResults = (event) => {
-		
-		this.props.dispatch(setSearchResults([]))
-		setTimeout(this.handleSubmit(event), 1000);
 
 	}
 
 
 	handleSubmit = (event) => {
 		console.log("<SearchPage> - handleSubmit()")
+		console.log("### submit started ###")
 		event.preventDefault()
 
+		this.changeSetFrom("search")
+		this.props.dispatch(setSearchResultsJson([]))
 		this.setState({searchLoading: true})
 
 		const url = this.queryUrlBuilder()
@@ -338,16 +121,10 @@ class SearchPage extends Component {
 			this.setState({searchLoading: false})
 			console.log({data})
 
-			// this.setState({jsonRes: data.resultItemList})
-
 			console.log("REDUX <SearchPage> - handleSubmit() - DISPATCH setSearchResultsJson()")
-			this.props.dispatch(setSearchResultsJson(data.resultItemList))
-
-
-			this.setState({cardsSetFromSearch: true})
-			this.setState({cardsSetFromSave: false})
-			this.setState({cardsSetFromMount: false})
-			this.generateCards(this.props.taskListJson)
+			
+			setTimeout(this.props.dispatch(setSearchResultsJson(data.resultItemList)), 1000);
+			
 			
 
 		})
@@ -355,57 +132,44 @@ class SearchPage extends Component {
 			console.log('404', error)
 
 			console.log("<SearchPage> - error - handleSubmit() - GET - ", url)
-			this.setState({jsonRes: demoResults})
+			
 
 			console.log("REDUX <SearchPage> - handleSubmit() - DISPATCH setSearchResultsJson()")
-			this.props.dispatch(setSearchResultsJson(demoResults))
-
-			console.log("data", demoResults)
-
-			this.setState({cardsSetFromSearch: true})
-			this.setState({cardsSetFromSave: false})
-			this.setState({cardsSetFromMount: false})
-			this.generateCards(this.props.taskListJson)
+			
 
 		})
 		//dispatch action with results as the payload
 	}
 
+
 	componentWillMount() {
-		this.setState({cardsSetFromSearch: false})
-		this.setState({cardsSetFromSave: false})
-		this.setState({cardsSetFromMount: true})
+		console.log('%componentWillMount()', 'color: #0000ff')
+		this.changeSetFrom("mount")
+		this.setState({resultsMount: this.props.searchResultsJson})
+		this.props.dispatch(setSearchResultsJson([]))
 
 	}
 
 
 	componentDidMount() {
-		this.setState({cardsSetFromSearch: false})
-		this.setState({cardsSetFromSave: false})
-		this.setState({cardsSetFromMount: true})
-		this.generateCards(this.props.taskListJson)
+		console.log('%ccomponentDidMount()', 'color: #00ffff')
+		this.props.dispatch(setSearchResultsJson(this.state.resultsMount))
 
 	}
 
 
 	render(){
-		// let style = {
-		// 		opacity: "0.15",
-		// 		position: "fixed",
-		// 		bottom: "10px",
-		// 		left: "33%",
-		// 		width: "490px",
-		// 		maxWidth: "50%"
-		//
-		// }
-
+		
 		console.log("<SearchPage> - render()")
 		console.log("")
-
+		console.log("### render happening ###")
+		let searchResultsData = this.props.searchResultsJson
+		console.log({searchResultsData})
+		
 		return(
 
 			<div>
-				<Form onSubmit={this.clearResults}>
+				<Form onSubmit={this.handleSubmit}>
 					<Grid columns='equal'>
 
 						<Grid.Row>
@@ -420,7 +184,7 @@ class SearchPage extends Component {
 							</Grid.Column>
 
 							<Grid.Column>
-								<Form.Field control={Checkbox} name="directJobsOnly" onChange={this.handleCheck} label="Full Time" checked={this.state.directJobsOnly}  />
+								<Form.Field control={Checkbox} name="fullTimeOnly" onClick={this.handleCheck} label="Full Time" checked={this.state.fullTimeOnly}  />
 							</Grid.Column>
 						</Grid.Row>
 
@@ -433,30 +197,7 @@ class SearchPage extends Component {
 					</Grid>
 				</Form>
 
-
-
-
-
-				{this.state.cardsSetFromSearch &&
-					<Transition.Group as={Grid} duration={1000} animation='fly right' centered={true}>
-						{this.props.searchResults}
-					</Transition.Group>
-
-				}
-
-				{this.state.cardsSetFromMount &&
-					<Transition.Group as={Grid} duration={1000} animation='fade' centered={true}>
-						{this.props.searchResults}
-					</Transition.Group>
-
-				}
-
-				{this.state.cardsSetFromSave &&
-					<Grid centered={true}>
-						{this.props.searchResults}
-					</Grid>
-
-				}
+				<SearchResults searchData={this.props.searchResultsJson}  setFrom={this.state.setFrom} savedJson={this.props.taskListJson} changeSetFrom={this.changeSetFrom.bind(this)} />
 
 			</div>
 
@@ -469,7 +210,7 @@ class SearchPage extends Component {
 
 function mapStateToProps(appState) {
 	const {isAuthenticated, errorMessage, isFetching} = appState.auth
-	let searchResults = appState.searchResults
+	let searchResultsJsx = appState.searchResultsJsx
 
 	console.log("<SearchPage> - mapStateToProps()")
 	console.log({appState})
@@ -479,7 +220,7 @@ function mapStateToProps(appState) {
 	  isAuthenticated,
 	  isFetching,
 	  errorMessage,
-	  searchResults,
+	  searchResultsJsx,
 	  taskListJson: appState.taskListJson,
 	  searchResultsJson: appState.searchResultsJson
 

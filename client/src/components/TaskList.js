@@ -281,28 +281,35 @@ class TaskList extends Component {
 
 
                                 <Grid>
+
                                     <Grid.Row width={16} verticalAlign='middle' style={{border: "0px solid orange", paddingBottom: "0px"}}>
 
                                         <Grid.Column width={14} style={{border: "0px solid green", margin: "0px", padding: "3px", paddingBottom: "0px"}}>
                                             <Header.Content><Icon name="bookmark outline" /><a href={job.detailUrl} rel="noopener noreferrer" target="_blank" style={{color: "black"}}>{job.jobTitle}</a></Header.Content>
                                         </Grid.Column>
+
                                         <Grid.Column width={1} textAlign='right' style={{border: "0px solid red", margin: "0px", padding: "0px"}}>
-                                        <Popup id={'popup' + idx} wide trigger={<Icon name='trash' size='large' style={{margin: "0px"}} />} on='click' hideOnScroll hideOnClick>
-                                            <Button value={idx} onClick={this.handleDelete} color='red'>Remove</Button>
-                                        </Popup>
-
+                                            <Popup id={'popup' + idx} wide trigger={<Icon name='trash' size='large' style={{margin: "0px"}} />} on='click' hideOnScroll hideOnClick>
+                                                <Button value={idx} onClick={this.handleDelete} color='red'>Remove</Button>
+                                            </Popup>
                                         </Grid.Column>
+
                                     </Grid.Row>
-                                    <Grid.Row style={{border: "0px solid orange", paddingTop: "0px", marginTop: "0px"}}>
-                                        <Grid.Column verticalAlign='top' textAlign='right' width={1} style={{border: "0px solid red", padding: "0px"}}>
 
+
+                                    <Grid.Row style={{border: "0px solid orange", paddingTop: "0px", marginTop: "0px"}}>
+
+                                        <Grid.Column verticalAlign='top' textAlign='right' width={1} style={{border: "0px solid red", padding: "0px"}}>
                                         </Grid.Column>
+
                                         <Grid.Column width={14} style={{border: "0px solid green", paddingTop: "0px"}}>
                                             <Header.Subheader><Icon name="building outline" />{job.company}</Header.Subheader>
                                             <Header.Subheader><Icon name="world" />{job.location}</Header.Subheader>
                                             <Header.Subheader><Icon name="wait" />{job.date}</Header.Subheader>
                                         </Grid.Column>
+
                                     </Grid.Row>
+
                                 </Grid>
 
 
@@ -382,16 +389,6 @@ class TaskList extends Component {
         console.log({userData})
         console.log("")
 
-        // let style = {
-        //     opacity: "0.35",
-        //     position: "fixed",
-        //     bottom: "10px",
-        //     left: "33%",
-        //     width: "490px",
-        //     maxWidth: "50%"
-        //
-        // }
-
         return (
 
             <div>
@@ -404,8 +401,6 @@ class TaskList extends Component {
                             <Grid.Column style={{paddingLeft: "5px"}} computer={1}>Response</Grid.Column>
                             <Grid.Column computer={6}>Notes</Grid.Column>
                         </Responsive>
-
-
 
                         {this.state.userData}
 
@@ -421,8 +416,6 @@ class TaskList extends Component {
                             <Grid.Column style={{paddingLeft: "5px"}} computer={1}>Response</Grid.Column>
                             <Grid.Column computer={6}>Notes</Grid.Column>
                         </Responsive>
-
-
 
                         {this.state.userData}
 

@@ -3,7 +3,7 @@ import thunkMiddleware from 'redux-thunk'
 import {apiMiddleware, authReducer} from './lib/auth'
 
 // import your reducers here
-import searchResults from './reduxReducers/searchResults'
+import searchResultsJsx from './reduxReducers/searchResultsJsx'
 import searchResultsJson from './reduxReducers/searchResultsJson'
 import taskListJson from './reduxReducers/taskListJson'
 
@@ -13,7 +13,7 @@ const createStoreWithMiddleware = applyMiddleware(thunkMiddleware, apiMiddleware
 
 const rootReducer = combineReducers({
   auth: authReducer,
-  searchResults: searchResults,
+  searchResultsJsx: searchResultsJsx,
   searchResultsJson: searchResultsJson,
   taskListJson: taskListJson
 })
