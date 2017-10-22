@@ -158,7 +158,7 @@ router.get('/listjobs/:id', function(req, res, next) {
   // get request data
   let user_id = req.params.id
   let sql = `
-    SELECT * FROM job_listings_saved WHERE "user_id" = $1
+    SELECT * FROM job_listings_saved WHERE "user_id" = $1 ORDER BY "detailUrl"
   `
 
   // do database stuff
