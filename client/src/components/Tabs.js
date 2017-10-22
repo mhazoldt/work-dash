@@ -44,7 +44,7 @@ class Tabs extends Component {
             console.log(err)
 			console.log("<Tabs> - error - updateTaskListJson() - GET - /api/listjobs/:id")
 
-			let data = [{detailUrl: "", data: err}]
+			
 			console.log("REDUX <Tabs> - error - updateTaskListJson() - DISPATCH setTaskListJson()")
             this.props.dispatch(setTaskListJson([]))
         })

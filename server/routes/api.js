@@ -158,7 +158,7 @@ router.get('/listjobs/:id', function(req, res, next) {
   // get request data
   let user_id = req.params.id
   let sql = `
-    SELECT * FROM job_listings_saved WHERE "user_id" = $1
+    SELECT * FROM job_listings_saved WHERE "user_id" = $1 ORDER BY "detailUrl"
   `
 
   // do database stuff
@@ -438,12 +438,13 @@ router.post('/editappdata/:id', function(req, res, next) {
 
 
 
-function queryUrlBuilder(search, location) {
+function queryUrlBuilder(search, location, full_time) {
   console.log("got to queryUrlBuilder()")
 
   let url = 'https://jobs.github.com/positions.json?'
   let searchQuery
   let locationQuery
+
 
   if(search) { 
     search = search.replace(/ /g, "+") 
@@ -452,7 +453,6 @@ function queryUrlBuilder(search, location) {
 
   }
 
-
   if(location) { 
     location = location.replace(/ /g, "+") 
     locationQuery = `&location=${location}`
@@ -460,14 +460,13 @@ function queryUrlBuilder(search, location) {
 
   }
 
-  // let state = `&state=${this.state.searchState}`
+  if(full_time) {
+    let fulll_time = `&full_time=true`
+    url = url + full_time
   
-  // let fullTimeQuery = `&full_time=${fullTime}`
+  }
 
-  // console.log({fullTime})
 
-  // if(this.state.searchCity) {url = url + state}
-  // if(location) {url = url + fullTime}
   console.log({url})
 
   return url
@@ -485,23 +484,23 @@ function queryUrlBuilder(search, location) {
 router.get('/jobsearch?', function(req, res, next) {
   let search = req.query.search
   let location = req.query.location
-  // let fullTime = req.query.fullTime
+  let full_time = req.query.full_time
 
 
   console.log("/api/jobsearch? endpoint")
   console.log({search})
   console.log({location})
-  // console.log({fullTime})
+  console.log({full_time})
 
-  let url = queryUrlBuilder(search, location)
+  let url = queryUrlBuilder(search, location, full_time)
 
 
   console.log("/api/jobsearch? - before request")
   request(url, function (error, response, body) {
     console.log('error:', error); // Print the error if one occurred
     console.log('statusCode:', response && response.statusCode); // Print the response status code if a response was received
-    console.log('body:', body); // Print the HTML for the Google homepage. 
-    console.log(typeof body)
+    // console.log('body:', body); // Print the HTML for the Google homepage. 
+    // console.log(typeof body)
     let bodyJson = JSON.parse(body)
     console.log(bodyJson.length)
     console.log(bodyJson[0])
