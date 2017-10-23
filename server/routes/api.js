@@ -330,7 +330,7 @@ router.get('/listappdata/:id', function(req, res, next) {
     // get request data
     let user_id = req.params.id
     let sql = `
-      SELECT * FROM app_data WHERE user_id = $1
+      SELECT * FROM app_data WHERE user_id = $1 ORDER BY label
     `
   
     // do database stuff

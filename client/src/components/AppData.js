@@ -2,6 +2,8 @@ import React, { Component } from 'react'
 import {connect} from 'react-redux'
 import { withRouter } from 'react-router'
 import { Form, Icon, Button, Popup, Table, Input } from 'semantic-ui-react'
+import shortid from 'shortid'
+
 
 class AppData extends Component {
 
@@ -53,17 +55,8 @@ class AppData extends Component {
 
     handleTableData = (e) => {
         console.log("<AppData> - handleTableData()")
-        console.log("--- className -", e.target.className)
-        let classNames = e.target.className
 
-        let classArr = classNames.split(" ")
-        let jsonIndex = classArr.slice(-1)[0]
-
-        classArr = jsonIndex.split("")
-        jsonIndex = classArr.slice(-1)[0]
-
-        console.log({jsonIndex})
-        console.log("name", e.target.name)
+        let jsonIndex = e.currentTarget.dataset.index
 
         let userDataJson = this.state.appDataListJson
         let jsonReq = userDataJson[jsonIndex]
@@ -106,17 +99,8 @@ class AppData extends Component {
 
     handleTableLabel = (e) => {
         console.log("<AppData> - handleTableLabel()")
-        console.log("--- className -", e.target.className)
-        let classNames = e.target.className
 
-        let classArr = classNames.split(" ")
-        let jsonIndex = classArr.slice(-1)[0]
-
-        classArr = jsonIndex.split("")
-        jsonIndex = classArr.slice(-1)[0]
-
-        console.log({jsonIndex})
-        console.log("name", e.target.name)
+        let jsonIndex = e.currentTarget.dataset.index
 
         let userDataJson = this.state.appDataListJson
         let jsonReq = userDataJson[jsonIndex]
@@ -174,22 +158,22 @@ class AppData extends Component {
         .then((data) => {
             console.log("<AppData> - THEN - renderResultsFromDb() - GET - /api/listappdata/:id")
             console.log({data})
-
-            self.setState({appDataListJson: data})
+            
+            self.setState({appDataListJson: data.rows})
 
             let appDataList = []
 
-            appDataList = data.map((appData, idx) => {
+            appDataList = data.rows.map((appData, idx) => {
                 return (
 
                     <Table.Row width={16} key={idx}>
 
                         <Table.Cell width={1}><Icon name='tag' /></Table.Cell>
-                        <Table.Cell width={2} className={`index${idx}`} onBlur={this.handleTableLabel} style={{fontWeight: "900"}} contentEditable="true">{appData.label}</Table.Cell>
+                        <Table.Cell key={'label' + shortid.generate()} width={2} data-index={idx} onBlur={this.handleTableLabel} style={{fontWeight: "900"}} contentEditable="true">{appData.label}</Table.Cell>
                         <Table.Cell width={1}><Icon name='cubes' /></Table.Cell>
-                        <Table.Cell width={7} id={`copy${idx}`} className={`index${idx}`} onBlur={this.handleTableData} contentEditable="true">{appData.data}</Table.Cell>
+                        <Table.Cell key={'data' + shortid.generate()} width={7} id={`copy${idx}`} data-index={idx} onBlur={this.handleTableData} contentEditable="true">{appData.data}</Table.Cell>
                         <Table.Cell width={5} textAlign="right">
-                            <Popup id={'popup' + idx} wide trigger={<Icon name='trash' size='large' style={{margin: "0px"}} />} on='click' hideOnScroll hideOnClick>
+                            <Popup key={'popup' + shortid.generate()} id={'popup' + idx} wide trigger={<Icon name='trash' size='large' style={{margin: "0px"}} />} on='click' hideOnScroll hideOnClick>
                                 <Button value={idx} onClick={this.handleDelete} color='red'>Remove</Button>
                             </Popup>
                             <Button color='black' value={idx} onClick={this.handleCopy} className="ml-2">Copy</Button>
