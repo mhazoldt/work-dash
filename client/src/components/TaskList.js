@@ -85,17 +85,10 @@ class TaskList extends Component {
 
     handleAppliedCheckbox = (e) => {
         console.log("<TaskList> - handleAppliedCheckbox()")
-        console.log("--className--", e.target.className)
+        
 
-        let classNames = e.target.className
-        let classArr = classNames.split(" ")
-        let jsonIndex = classArr.slice(-1)[0]
-
-        classArr = jsonIndex.split("")
-        jsonIndex = classArr.slice(-1)[0]
-
+        let jsonIndex = e.currentTarget.value
         console.log({jsonIndex})
-        console.log("name", e.target.name)
 
         let userDataJson = this.props.taskListJson
         let jsonReq = userDataJson[jsonIndex]
@@ -138,17 +131,10 @@ class TaskList extends Component {
 
     handleResponseCheckbox = (e) => {
         console.log("<TaskList> - handleAppliedCheckbox()")
-        console.log("--- className -", e.target.className)
 
-        let classNames = e.target.className
-        let classArr = classNames.split(" ")
-        let jsonIndex = classArr.slice(-1)[0]
-
-        classArr = jsonIndex.split("")
-        jsonIndex = classArr.slice(-1)[0]
-
+        let jsonIndex = e.currentTarget.value
         console.log({jsonIndex})
-        console.log("name", e.target.name)
+        
 
         let userDataJson = this.props.taskListJson
         let jsonReq = userDataJson[jsonIndex]
@@ -303,14 +289,14 @@ class TaskList extends Component {
                     <Grid.Column computer={1} mobile={8} textAlign='center' style={{height: "100%"}}>
                         <div style={{border: "0px solid blue", margin: "0px", padding: "0px", height: "100%", display: "flex"}}>
                         {!(haveApplied) &&
-                            <Button className={`checkboxButton index${idx}`} onClick={this.handleAppliedCheckbox}>
-                                <Icon color='red' style={{border: "0px solid orange", margin: "0px", padding: "0px"}} className={`index${idx}`} name='square outline' size='big' />
+                            <Button className='checkboxButton' onClick={this.handleAppliedCheckbox} value={idx}>
+                                <Icon color='red' style={{border: "0px solid orange", margin: "0px", padding: "0px"}} name='square outline' size='big' />
                             </Button>
 
                         }
                         {haveApplied &&
-                            <Button className={`checkboxButton index${idx}`} onClick={this.handleAppliedCheckbox}>
-                                <Icon color='green' style={{border: "0px solid orange", margin: "0px", padding: "0px"}} className={`index${idx}`} name='checkmark box' size='big' />
+                            <Button className='checkboxButton' onClick={this.handleAppliedCheckbox} value={idx}>
+                                <Icon color='green' style={{border: "0px solid orange", margin: "0px", padding: "0px"}} name='checkmark box' size='big' />
                             </Button>
 
                         }
@@ -319,20 +305,20 @@ class TaskList extends Component {
                     <Grid.Column computer={1} mobile={8} textAlign='center' style={{height: "100%"}}>
                         <div style={{border: "0px solid blue", margin: "0px", padding: "0px", height: "100%", display: "flex"}}>
                         {!(responseReceived) &&
-                            <Button className={`checkboxButton index${idx}`} onClick={this.handleResponseCheckbox} >
-                                <Icon color='red' style={{border: "0px solid orange", margin: "0px", padding: "0px"}} className={`index${idx}`} name='square outline' size='big' />
+                            <Button className='checkboxButton' onClick={this.handleResponseCheckbox} value={idx}>
+                                <Icon color='red' style={{border: "0px solid orange", margin: "0px", padding: "0px"}} name='square outline' size='big' />
                             </Button>
 
                         }
                         {responseReceived &&
-                            <Button className={`checkboxButton index${idx}`} onClick={this.handleResponseCheckbox} >
-                                <Icon color='green' style={{border: "0px solid orange", margin: "0px", padding: "0px"}} className={`index${idx}`} name='checkmark box' size='big' />
+                            <Button className='checkboxButton' onClick={this.handleResponseCheckbox} value={idx}>
+                                <Icon color='green' style={{border: "0px solid orange", margin: "0px", padding: "0px"}} name='checkmark box' size='big' />
                             </Button>
 
                         }
                         </div>
                     </Grid.Column>
-                    <Grid.Column computer={6} mobile={16}><Form><TextArea defaultValue={job.followed_up.toString()} data-index={idx} onBlur={this.handleNotes} /></Form></Grid.Column>
+                    <Grid.Column computer={6} mobile={16}><Form><TextArea defaultValue={job.followed_up} data-index={idx} onBlur={this.handleNotes} /></Form></Grid.Column>
 
                 </Grid.Row>
 
