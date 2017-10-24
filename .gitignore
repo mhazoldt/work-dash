@@ -13,6 +13,3 @@ yarn-debug.log*
 yarn-error.log*
 yarn.lock
 
-/db/db.js
-/server/db/db.js
-server/db/db.js
