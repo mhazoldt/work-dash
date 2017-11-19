@@ -461,7 +461,7 @@ function queryUrlBuilder(search, location, full_time) {
   }
 
   if(full_time) {
-    let fulll_time = `&full_time=true`
+    let full_time = `&full_time=true`
     url = url + full_time
   
   }
